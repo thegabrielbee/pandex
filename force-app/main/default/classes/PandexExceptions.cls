@@ -3,4 +3,5 @@ public with sharing class PandexExceptions {
     public class MixedDataTypesException extends Exception {}
     public class TypeNotSupportedException extends Exception {}
     public class SizeMismatchException extends Exception {}
+    public class ParameterException extends Exception {}
 }

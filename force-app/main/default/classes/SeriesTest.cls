@@ -85,11 +85,13 @@ public with sharing class SeriesTest {
     @isTest
     public static void medianShouldBeDoneWithNumericFields() {
         List<Object> data = new List<Object>{ 1, 30, 304 };
+        data.sort();
         Decimal expected = (Decimal) data[data.size() / 2];
         Series s = new Series(data);
 
         List<Object> data2 = new List<Object>{ 1, 30, 304, 40 };
-        Decimal expected2 = ((Decimal) data2[data2.size() / 2] + (Decimal) data2[data2.size() / 2 - 1]) / 2;
+        data2.sort();
+        Decimal expected2 = ((Decimal) data2[data2.size() / 2 - 1] + (Decimal) data2[data2.size() / 2]) / 2;
         Series s2 = new Series(data2);
 
         List<Object> data3 = new List<Object>{ };
@@ -385,5 +387,75 @@ public with sharing class SeriesTest {
 
         Assert.isTrue(expected.equals(resulted).all());
         Assert.isNull(resulted2);
+    }
+
+    @isTest
+    public static void countShouldBeDoneWithNumericFields() {
+        List<Object> data = new List<Object>{ 1, 30, 304, -2, 3, 5 };
+        List<Object> data2 = new List<Object>{};
+        Series expected = new Series(new List<Object>{ 1, 30, 304, 304, 304, 304 });
+
+        Series s = new Series(data);
+        Series s2 = new Series(data2);
+
+        Test.startTest();
+            Integer resulted = s.count();
+            Integer resulted2 = s2.count();
+        Test.stopTest();
+
+        Assert.areEqual(6, resulted);
+        Assert.areEqual(0, resulted2);
+    }
+
+    @isTest
+    public static void quantileShouldNotBeDoneWithNonNumericFields() {
+        List<Object> data = new List<Object>{ 'Gabriel', 'Carvalho', 'Nascimento' };
+        Series s = new Series(data);
+        Boolean errorWasRaised = False;
+        Test.startTest();
+            try {
+                s.quantile(0.75);
+            } catch (PandexExceptions.InvalidDataTypeException e) {
+                errorWasRaised = true;
+            }
+        Test.stopTest();
+        Assert.isTrue(errorWasRaised, 'This series has non numeric and should raise an error.');
+    }
+
+    @isTest
+    public static void quantileShouldBeBeetween0And1() {
+        List<Object> data = new List<Object>{ 3, 5, 7, 8, 12, 13, 14, 18, 21 };
+        Series s = new Series(data);
+        Boolean errorWasRaised = False;
+        Test.startTest();
+            try {
+                s.quantile(2);
+            } catch (PandexExceptions.ParameterException e) {
+                errorWasRaised = true;
+            }
+        Test.stopTest();
+        Assert.isTrue(errorWasRaised, 'q parameter must be between 0 and 1.');
+    }
+
+    @isTest
+    public static void quantileShouldBeDoneWithNumericFields() {
+        List<Object> data = new List<Object>{ 3, 5, 7, 8, 12, 13, 14, 18, 21 };
+        List<Object> data2 = new List<Object>{};
+        Series expected = new Series(new List<Object>{ 1, 30, 304, 304, 304, 304 });
+
+        Series s = new Series(data);
+        Series s2 = new Series(data2);
+
+        Test.startTest();
+            Decimal resulted = s.quantile(.25);
+            Decimal resulted2 = s.quantile(.5);
+            Decimal resulted3 = s.quantile(.75);
+            Decimal resulted4 = s2.quantile(.75);
+        Test.stopTest();
+
+        Assert.areEqual(7.0, resulted);
+        Assert.areEqual(12.0, resulted2);
+        Assert.areEqual(14.0, resulted3);
+        Assert.isNull(resulted4);
     }
 }

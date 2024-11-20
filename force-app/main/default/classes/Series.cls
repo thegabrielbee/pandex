@@ -85,12 +85,15 @@ public with sharing class Series {
             throw new PandexExceptions.InvalidDataTypeException('Median operation not supported on the type of this Series: ' + String.valueOf(this.data[0]));
         }
 
-        Integer seriesSize = this.data.size();
+        List<Object> data = this.data.clone();
+        data.sort();
+        
+        Integer seriesSize = data.size();
         Integer midIndex = seriesSize / 2;
         if(Math.mod(seriesSize, 2) == 0){
-            return ((Decimal) this.data[midIndex - 1] + (Decimal) this.data[midIndex]) / 2;
+            return ((Decimal) data[midIndex - 1] + (Decimal) data[midIndex]) / 2;
         } else {
-            return (Decimal) this.data[midIndex];
+            return (Decimal) data[midIndex];
         }
     }
 
@@ -198,7 +201,7 @@ public with sharing class Series {
         if(this.data.isEmpty()) return null;
         // Throws a exception if the data is not numeric
         if(!this.numericTypes.contains(this.seriesType)){
-            throw new PandexExceptions.InvalidDataTypeException('Cumulative Product operation not supported on the type of this Series: ' + String.valueOf(this.data[0]));
+            throw new PandexExceptions.InvalidDataTypeException('Cumulative Minimun operation not supported on the type of this Series: ' + String.valueOf(this.data[0]));
         }
 
         Decimal minimun = (Decimal) this.data[0];
@@ -216,7 +219,7 @@ public with sharing class Series {
         if(this.data.isEmpty()) return null;
         // Throws a exception if the data is not numeric
         if(!this.numericTypes.contains(this.seriesType)){
-            throw new PandexExceptions.InvalidDataTypeException('Cumulative Product operation not supported on the type of this Series: ' + String.valueOf(this.data[0]));
+            throw new PandexExceptions.InvalidDataTypeException('Cumulative Maximun operation not supported on the type of this Series: ' + String.valueOf(this.data[0]));
         }
 
         Decimal maximun = (Decimal) this.data[0];
@@ -230,9 +233,28 @@ public with sharing class Series {
         return new Series(data);
     }
 
-    //public Decimal cummun() {}
-    //public Decimal kurt() {}
-    //public Decimal skew() {}
-    //public Decimal count() {}
-    //public Decimal quantile() {}
+    public Integer count() {
+        if(this.data.isEmpty()) return 0;
+        Integer countValue = 0;
+        for(Integer i = 0; i < this.data.size(); i++){
+            countValue += 1;
+        }
+        return countValue;
+    }
+
+    public Decimal quantile(Decimal q) {
+        if(q < 0 || q > 1) {
+            throw new PandexExceptions.ParameterException('Quantile (q) must be between 0 and 1. You pass: ' + String.valueOf(q) + '.');
+        }
+        if(this.data.isEmpty()) return null;
+        // Throws a exception if the data is not numeric
+        if(!this.numericTypes.contains(this.seriesType)){
+            throw new PandexExceptions.InvalidDataTypeException('Quantile operation not supported on the type of this Series: ' + String.valueOf(this.data[0]));
+        }
+
+        List<Object> data = this.data.clone();
+        data.sort();
+        Integer k = (Integer) Math.floor(q * (data.size() - 1));
+        return (Decimal) data.get(k);
+    }
 }
