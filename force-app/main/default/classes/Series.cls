@@ -11,10 +11,16 @@ public with sharing class Series {
 
     /**
     * @author Gabriel Nasicmento - gabriel.carva@protonmail.com
+    * @description Empty contructor for Series that initialize empty
+    **/
+    public Series() {}
+
+    /**
+    * @author Gabriel Nasicmento - gabriel.carva@protonmail.com
     * @description Contructor for Series that initialize with a List of data of the same Type
     * @param List<Object> data - Objects of the same type to be converted into a Series
     *  
-    * List<Object> data = new List<Object>{ 1, 6546456.2, 34 }
+    * List<Object> data = new List<Object>{ 1, 6546456.2, 34 };
     * Series s = new Series(data);
     * 
     * So your Series will look like this: 
@@ -49,8 +55,8 @@ public with sharing class Series {
     * @description Contructor for Series that initialize with a List of data of the same Type
     * @param List<Object> data - Objects of the same type to be converted into a Series
     *  
-    * List<Object> data = new List<Object>{ 1, 6546456.2, 34 }
-    * List<Object> index = new List<Object>{ 'CustomerId', 'Net Worth', 'Age' }
+    * List<Object> data = new List<Object>{ 1, 6546456.2, 34 };
+    * List<Object> index = new List<Object>{ 'CustomerId', 'Net Worth', 'Age' };
     * Series s = new Series(data, index);
     * 
     * So your Series will look like this: 
@@ -90,11 +96,13 @@ public with sharing class Series {
     * @param Object data - Data to be inserted * Must be of the same type of the Series
     **/
     public void add(Object data){
-        this.data.add(data);
         Type seriesType = PandexUtils.getPrimitiveType(data);
         if(this.seriesType != null && seriesType != this.seriesType) {
             throw new PandexExceptions.MixedDataTypesException('The Series Object only support values of the same type.');
         }
+
+        this.data.add(data);
+        this.index.add(this.index.size());
 
         if(this.seriesType == null && seriesType != null) {
             this.seriesType = seriesType;
@@ -212,10 +220,25 @@ public with sharing class Series {
     * @param Integer rowIndex - Index to be retrieved
     **/
     public Object row(Integer rowIndex) {
-        if(rowIndex > this.data.size()-1) {
+        Integer index = this.index.indexOf(rowIndex);
+        if(index == -1) {
             throw new PandexExceptions.AccessException('The index provided is out of bounds.');
         }
-        return this.data[rowIndex];
+        return this.data[index];
+    }
+
+    /**
+    * @author Gabriel Nasicmento - gabriel.carva@protonmail.com
+    * @description Method designed to return the value in the
+    * passed index.
+    * @param String rowIndex - Index to be retrieved
+    **/
+    public Object row(String rowIndex) {
+        Integer index = this.index.indexOf(rowIndex);
+        if(index == -1) {
+            throw new PandexExceptions.AccessException('The index provided is out of bounds.');
+        }
+        return this.data[index];
     }
 
     /**

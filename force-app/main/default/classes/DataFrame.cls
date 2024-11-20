@@ -128,8 +128,8 @@ public with sharing class DataFrame {
     * @description Contructor for DataFrames that initialize with Matrix
     * @param List<List<Object>> data - Matrix to be converted into a DataFrame
     * 
-    * List<Object> costumer1Data = new List<Object>{ 1, 6546456.2, 34 }
-    * List<Object> costumer2Data = new List<Object>{ 2, 432423.34, 48}
+    * List<Object> costumer1Data = new List<Object>{ 1, 6546456.2, 34 };
+    * List<Object> costumer2Data = new List<Object>{ 2, 432423.34, 48 };
     * 
     * List<List<Object>> data = new List<List<Object>> { 
     *    costumer1Data,
