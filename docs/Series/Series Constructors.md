@@ -24,7 +24,7 @@ List<Object> index = new List<Object>{ 'CustomerId', 'Net Worth', 'Age' };
 
 Series s = new Series(data, index);
 // So your Series will look like this:
-// CustomerId 	1
-// Net Worth 	6546456.2
-// Age 			34
+// CustomerId  1
+// Net Worth   6546456.2
+// Age 			   34
 ```
