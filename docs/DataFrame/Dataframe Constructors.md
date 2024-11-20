@@ -9,8 +9,8 @@ List<Case> data = new List<Case>{ c1, c2 };
 DataFrame df = new DataFrame(data);
 // So your DataFrame will look like this:
 //
-//		Subject 								| 	Priority
-// 0 	Why Pandex is so amazing? 				| 	null
+//	Subject 				| 	Priority
+// 0 	Why Pandex is so amazing? 		| 	null
 // 1 	Because he is made by amazing people! 	| 	High
 ```
 
@@ -31,7 +31,7 @@ Map<String, List<SObject>> data = new Map<String, List<SObject>>{
 
 DataFrame df = new DataFrame(data);
 //So your DataFrame will look like this:
-// 		customerIds | 	invoiceValues
+// 	customerIds 		| 	invoiceValues
 // 0 	1 			| 	2213.321
 // 1 	2 			| 	432423.3
 // 2 	3 			| 	5435443.2
@@ -43,7 +43,7 @@ List<Object> data = new List<Object>{ 43, 21, 34 };
 
 DataFrame df = new DataFrame(data);
 // So your DataFrame will look like this:
-// 		0
+// 	0
 // 0 	43
 // 1 	21
 // 2 	34
@@ -60,7 +60,7 @@ List<List<Object>> data = new List<List<Object>> {
 
 DataFrame df = new DataFrame(data);
 // So your DataFrame will look like this:
-// 		0 	| 	1 			| 	2
+// 	0 	| 	1 		| 	2
 // 0 	1 	| 	6546456.2 	| 	34
 // 1 	2 	| 	432423.34 	| 	48
 
