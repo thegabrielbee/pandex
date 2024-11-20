@@ -1,10 +1,27 @@
+/**
+* @author Gabriel Nasicmento - gabriel.carva@protonmail.com
+* @description Class designed to handle Python Pandas-like Series 
+**/
 public with sharing class Series {
-    public List<Object> data = null;
-    public List<Object> index = null;
+    public List<Object> data = new List<Object>();
+    public List<Object> index = new List<Object>();
     private Type seriesType = null;
     private Set<Type> validTypes = new Set<Type>{ Integer.class, Decimal.class, Double.class, String.class, Boolean.class };
     private Set<Type> numericTypes = new Set<Type>{ Integer.class, Decimal.class, Double.class };
 
+    /**
+    * @author Gabriel Nasicmento - gabriel.carva@protonmail.com
+    * @description Contructor for Series that initialize with a List of data of the same Type
+    * @param List<Object> data - Objects of the same type to be converted into a Series
+    *  
+    * List<Object> data = new List<Object>{ 1, 6546456.2, 34 }
+    * Series s = new Series(data);
+    * 
+    * So your Series will look like this: 
+    *  0         1
+    *  1         6546456.2
+    *  2         34
+    **/
     public Series(List<Object> data) {
         Type seriesType;
         Type seriesLastType;
@@ -27,6 +44,20 @@ public with sharing class Series {
         this.data = data;
     }
 
+    /**
+    * @author Gabriel Nasicmento - gabriel.carva@protonmail.com
+    * @description Contructor for Series that initialize with a List of data of the same Type
+    * @param List<Object> data - Objects of the same type to be converted into a Series
+    *  
+    * List<Object> data = new List<Object>{ 1, 6546456.2, 34 }
+    * List<Object> index = new List<Object>{ 'CustomerId', 'Net Worth', 'Age' }
+    * Series s = new Series(data, index);
+    * 
+    * So your Series will look like this: 
+    *  CustomerId       1
+    *  Net Worth        6546456.2
+    *  Age              34
+    **/
     public Series(List<Object> data, List<Object> index) {
         Integer dataSize = data.size();
         Integer indexSize = data.size();
@@ -52,6 +83,12 @@ public with sharing class Series {
         this.data = data;
     }
 
+    /**
+    * @author Gabriel Nasicmento - gabriel.carva@protonmail.com
+    * @description Method designed to append data into the final  
+    * of a Series.
+    * @param Object data - Data to be inserted * Must be of the same type of the Series
+    **/
     public void add(Object data){
         this.data.add(data);
         Type seriesType = PandexUtils.getPrimitiveType(data);
@@ -64,6 +101,13 @@ public with sharing class Series {
         }
     }
 
+    /**
+    * @author Gabriel Nasicmento - gabriel.carva@protonmail.com
+    * @description Method designed to Sum 2 different Series and
+    * return another one with the Added values.
+    * @param Series s - Series to be Added * Must be of a numeric 
+    * type and have the same size of the base Series being Added
+    **/
     public Series sum(Series s){
         // Throws a exception if the data is not numeric
         if(!this.numericTypes.contains(this.seriesType) || !this.numericTypes.contains(s.seriesType)){
@@ -81,6 +125,13 @@ public with sharing class Series {
         return new Series(sumValues);
     }
 
+    /**
+    * @author Gabriel Nasicmento - gabriel.carva@protonmail.com
+    * @description Method designed to Subtract 2 different Series and
+    * return another one with the Subtracted values.
+    * @param Series s - Series to be Subtracted * Must be of a numeric
+    * type and have the same size of the base Series being Subtracted
+    **/
     public Series sub(Series s){
         // Throws a exception if the data is not numeric
         if(!this.numericTypes.contains(this.seriesType) || !this.numericTypes.contains(s.seriesType)){
@@ -98,6 +149,13 @@ public with sharing class Series {
         return new Series(subValues);
     }
 
+    /**
+    * @author Gabriel Nasicmento - gabriel.carva@protonmail.com
+    * @description Method designed to Multiply 2 different Series and
+    * return another one with the Multiplied values.
+    * @param Series s - Series to be Multiplied * Must be of a numeric
+    * type and have the same size of the base Series being Multiplied
+    **/
     public Series mul(Series s){
         // Throws a exception if the data is not numeric
         if(!this.numericTypes.contains(this.seriesType) || !this.numericTypes.contains(s.seriesType)){
@@ -115,6 +173,13 @@ public with sharing class Series {
         return new Series(mulValues);
     }
 
+    /**
+    * @author Gabriel Nasicmento - gabriel.carva@protonmail.com
+    * @description Method designed to Divide 2 different Series and
+    * return another one with the Divided values.
+    * @param Series s - Series to be Divided * Must be of a numeric
+    * type and have the same size of the base Series being Divided
+    **/
     public Series div(Series s){
         // Throws a exception if the data is not numeric
         if(!this.numericTypes.contains(this.seriesType) || !this.numericTypes.contains(s.seriesType)){
@@ -132,10 +197,20 @@ public with sharing class Series {
         return new Series(divValues);
     }
 
+    /**
+    * @author Gabriel Nasicmento - gabriel.carva@protonmail.com
+    * @description Method designed to return the Size of the Series
+    **/
     public Integer size() {
         return this.data.size();
     }
     
+    /**
+    * @author Gabriel Nasicmento - gabriel.carva@protonmail.com
+    * @description Method designed to return the value in the
+    * passed index.
+    * @param Integer rowIndex - Index to be retrieved
+    **/
     public Object row(Integer rowIndex) {
         if(rowIndex > this.data.size()-1) {
             throw new PandexExceptions.AccessException('The index provided is out of bounds.');
@@ -143,6 +218,21 @@ public with sharing class Series {
         return this.data[rowIndex];
     }
 
+    /**
+    * @author Gabriel Nasicmento - gabriel.carva@protonmail.com
+    * @description Method designed to compare the scalar equality 
+    * of two Series of the same type and size.
+    * @param Series s - Series to be compared
+    * List<Object> data = new List<Object>{ 1, 6546456.2, 34 };
+    * List<Object> data2 = new List<Object>{ 1, 3214321.56, 34 };
+    * Series s = new Series(data);
+    * Series s2 = new Series(data2);
+    * 
+    * So s.equals(s2) will look like:
+    *  0         true
+    *  1         false
+    *  2         true
+    **/
     public Series equals(Series s) {
         if (this.data.size() != s.data.size()) {
             throw new PandexExceptions.SizeMismatchException('Can\'t compare two Series with different Sizes.');
@@ -157,18 +247,27 @@ public with sharing class Series {
         return new Series(data);
     }
 
+    /**
+    * @author Gabriel Nasicmento - gabriel.carva@protonmail.com
+    * @description Method designed evaluate if all values of a
+    * Boolean Series are true.
+    **/
     public Boolean all() {
         if(this.seriesType != Boolean.class) {
             throw new PandexExceptions.MixedDataTypesException('Can\'t use this operation with series that aren\'t Boolean.');
         }
         Boolean isAll = true;
-        if(this.data == null || this.data.isEmpty()) return isAll;
+        if(this.data.isEmpty()) return isAll;
         for(Integer i = 0; i < this.data.size(); i++){
             if(!(Boolean) data[i]) return false;
         }
         return isAll;
     }
 
+    /**
+    * @author Gabriel Nasicmento - gabriel.carva@protonmail.com
+    * @description Calculate the Mean/Avarage of the Series
+    **/
     public Decimal mean() {
         if(this.data.isEmpty()) return 0;
         // Throws a exception if the data is not numeric
@@ -185,6 +284,10 @@ public with sharing class Series {
         return sum / counter;
     }
 
+    /**
+    * @author Gabriel Nasicmento - gabriel.carva@protonmail.com
+    * @description Calculate the Sum of the Series
+    **/
     public Decimal sum() {
         if(this.data.isEmpty()) return 0;
         // Throws a exception if the data is not numeric
@@ -199,6 +302,10 @@ public with sharing class Series {
         return sum;
     }
 
+    /**
+    * @author Gabriel Nasicmento - gabriel.carva@protonmail.com
+    * @description Calculate the Median of the Series
+    **/
     public Decimal median() {
         if(this.data.isEmpty()) return null;
         // Throws a exception if the data is not numeric
@@ -219,6 +326,10 @@ public with sharing class Series {
     }
 
 
+    /**
+    * @author Gabriel Nasicmento - gabriel.carva@protonmail.com
+    * @description Calculate the Standard Deviation of the Series
+    **/
     public Decimal std() {
         if(this.data.isEmpty()) return null;
         // Throws a exception if the data is not numeric
@@ -234,6 +345,10 @@ public with sharing class Series {
         return sumStd / this.data.size();
     }
 
+    /**
+    * @author Gabriel Nasicmento - gabriel.carva@protonmail.com
+    * @description Return the Maximun scalar of the Series
+    **/
     public Decimal max() {
         if(this.data.isEmpty()) return null;
         // Throws a exception if the data is not numeric
@@ -248,6 +363,10 @@ public with sharing class Series {
         return max;
     }
 
+    /**
+    * @author Gabriel Nasicmento - gabriel.carva@protonmail.com
+    * @description Return the Minimun scalar of the Series
+    **/
     public Decimal min() {
         if(this.data.isEmpty()) return null;
         // Throws a exception if the data is not numeric
@@ -262,6 +381,10 @@ public with sharing class Series {
         return min;
     }
 
+    /**
+    * @author Gabriel Nasicmento - gabriel.carva@protonmail.com
+    * @description Calculate the Product of the Series
+    **/
     public Decimal prod() {
         if(this.data.isEmpty()) return null;
         // Throws a exception if the data is not numeric
@@ -276,6 +399,10 @@ public with sharing class Series {
         return prod;
     }
 
+    /**
+    * @author Gabriel Nasicmento - gabriel.carva@protonmail.com
+    * @description Calculate the Variance of the Series
+    **/
     public Decimal var() {
         if(this.data.isEmpty()) return null;
         // Throws a exception if the data is not numeric
@@ -286,6 +413,11 @@ public with sharing class Series {
         return (Decimal) Math.pow((Double) this.std(), 2);
     }
     
+    /**
+    * @author Gabriel Nasicmento - gabriel.carva@protonmail.com
+    * @description Return a Series that is the Cummulative Sum 
+    * of the actual Series
+    **/
     public Series cumsum() {
         if(this.data.isEmpty()) return null;
         // Throws a exception if the data is not numeric
@@ -302,6 +434,11 @@ public with sharing class Series {
         return new Series(data);
     }
 
+    /**
+    * @author Gabriel Nasicmento - gabriel.carva@protonmail.com
+    * @description Return a Series that is the Cummulative Product 
+    * of the actual Series
+    **/
     public Series cumprod() {
         if(this.data.isEmpty()) return null;
         // Throws a exception if the data is not numeric
@@ -318,6 +455,11 @@ public with sharing class Series {
         return new Series(data);
     }
 
+    /**
+    * @author Gabriel Nasicmento - gabriel.carva@protonmail.com
+    * @description Return a Series that is the Cummulative Minimun 
+    * of the actual Series
+    **/
     public Series cummin() {
         if(this.data.isEmpty()) return null;
         // Throws a exception if the data is not numeric
@@ -336,6 +478,11 @@ public with sharing class Series {
         return new Series(data);
     }
 
+    /**
+    * @author Gabriel Nasicmento - gabriel.carva@protonmail.com
+    * @description Return a Series that is the Cummulative Maximun 
+    * of the actual Series
+    **/
     public Series cummax() {
         if(this.data.isEmpty()) return null;
         // Throws a exception if the data is not numeric
@@ -354,15 +501,11 @@ public with sharing class Series {
         return new Series(data);
     }
 
-    public Integer count() {
-        if(this.data.isEmpty()) return 0;
-        Integer countValue = 0;
-        for(Integer i = 0; i < this.data.size(); i++){
-            countValue += 1;
-        }
-        return countValue;
-    }
-
+    /**
+    * @author Gabriel Nasicmento - gabriel.carva@protonmail.com
+    * @description Return a Quantile(q) value of the Series
+    * @param Decimal q - The quantile to be returned
+    **/
     public Decimal quantile(Decimal q) {
         if(q < 0 || q > 1) {
             throw new PandexExceptions.ParameterException('Quantile (q) must be between 0 and 1. You pass: ' + String.valueOf(q) + '.');
