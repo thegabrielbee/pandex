@@ -1,5 +1,6 @@
 public with sharing class Series {
     public List<Object> data = null;
+    public List<Object> index = null;
     private Type seriesType = null;
     private Set<Type> validTypes = new Set<Type>{ Integer.class, Decimal.class, Double.class, String.class, Boolean.class };
     private Set<Type> numericTypes = new Set<Type>{ Integer.class, Decimal.class, Double.class };
@@ -7,7 +8,35 @@ public with sharing class Series {
     public Series(List<Object> data) {
         Type seriesType;
         Type seriesLastType;
+        List<Object> index = new List<Object>();
         for(Integer i = 0; i < data.size(); i++){
+            if(data[i] == null) continue;
+            seriesType = PandexUtils.getPrimitiveType(data[i]);
+            if(!validTypes.contains(seriesType)) {
+                throw new PandexExceptions.TypeNotSupportedException('Type provided has not been supported yet. Only ' + String.join(this.validTypes, ', ') + 'are supported for now.');
+            }
+            if(seriesType != null && seriesLastType != null && !seriesType.equals(seriesLastType)){
+                throw new PandexExceptions.MixedDataTypesException('The Series Object only support values of the same type.');
+            }
+            seriesLastType = seriesType;
+            index.add(i);
+        }
+
+        this.index = index;
+        this.seriesType = seriesType;
+        this.data = data;
+    }
+
+    public Series(List<Object> data, List<Object> index) {
+        Integer dataSize = data.size();
+        Integer indexSize = data.size();
+        if(dataSize != indexSize) {
+            throw new PandexExceptions.SizeMismatchException('Data and Index must have the same size: ' + data + 'X' + indexSize);
+        }
+        Type seriesType;
+        Type seriesLastType;
+        for(Integer i = 0; i < dataSize; i++){
+            if(data[i] == null) continue;
             seriesType = PandexUtils.getPrimitiveType(data[i]);
             if(!validTypes.contains(seriesType)) {
                 throw new PandexExceptions.TypeNotSupportedException('Type provided has not been supported yet. Only ' + String.join(this.validTypes, ', ') + 'are supported for now.');
@@ -19,7 +48,99 @@ public with sharing class Series {
         }
 
         this.seriesType = seriesType;
+        this.index = index;
         this.data = data;
+    }
+
+    public void add(Object data){
+        this.data.add(data);
+        Type seriesType = PandexUtils.getPrimitiveType(data);
+        if(this.seriesType != null && seriesType != this.seriesType) {
+            throw new PandexExceptions.MixedDataTypesException('The Series Object only support values of the same type.');
+        }
+
+        if(this.seriesType == null && seriesType != null) {
+            this.seriesType = seriesType;
+        }
+    }
+
+    public Series sum(Series s){
+        // Throws a exception if the data is not numeric
+        if(!this.numericTypes.contains(this.seriesType) || !this.numericTypes.contains(s.seriesType)){
+            throw new PandexExceptions.InvalidDataTypeException('Sum operation is only supperted by Series of Numeric Types');
+        }
+
+        if(this.size() != s.size()){
+            throw new PandexExceptions.SizeMismatchException('Can\'t sum two Series with different Sizes.');
+        }
+
+        List<Decimal> sumValues = new List<Decimal>(); 
+        for(Integer i = 0; i < this.data.size(); i++){
+            sumValues.add((Decimal) this.data[i] + (Decimal) s.data[i]);
+        }
+        return new Series(sumValues);
+    }
+
+    public Series sub(Series s){
+        // Throws a exception if the data is not numeric
+        if(!this.numericTypes.contains(this.seriesType) || !this.numericTypes.contains(s.seriesType)){
+            throw new PandexExceptions.InvalidDataTypeException('Subtraction operation is only supperted by Series of Numeric Types');
+        }
+
+        if(this.size() != s.size()){
+            throw new PandexExceptions.SizeMismatchException('Can\'t sub two Series with different Sizes.');
+        }
+
+        List<Decimal> subValues = new List<Decimal>(); 
+        for(Integer i = 0; i < this.data.size(); i++){
+            subValues.add((Decimal) this.data[i] - (Decimal) s.data[i]);
+        }
+        return new Series(subValues);
+    }
+
+    public Series mul(Series s){
+        // Throws a exception if the data is not numeric
+        if(!this.numericTypes.contains(this.seriesType) || !this.numericTypes.contains(s.seriesType)){
+            throw new PandexExceptions.InvalidDataTypeException('Multiplication operation is only supperted by Series of Numeric Types');
+        }
+
+        if(this.size() != s.size()){
+            throw new PandexExceptions.SizeMismatchException('Can\'t mul two Series with different Sizes.');
+        }
+
+        List<Decimal> mulValues = new List<Decimal>(); 
+        for(Integer i = 0; i < this.data.size(); i++){
+            mulValues.add((Decimal) this.data[i] * (Decimal) s.data[i]);
+        }
+        return new Series(mulValues);
+    }
+
+    public Series div(Series s){
+        // Throws a exception if the data is not numeric
+        if(!this.numericTypes.contains(this.seriesType) || !this.numericTypes.contains(s.seriesType)){
+            throw new PandexExceptions.InvalidDataTypeException('Division operation is only supperted by Series of Numeric Types');
+        }
+
+        if(this.size() != s.size()){
+            throw new PandexExceptions.SizeMismatchException('Can\'t div two Series with different Sizes.');
+        }
+
+        List<Decimal> divValues = new List<Decimal>(); 
+        for(Integer i = 0; i < this.data.size(); i++){
+            divValues.add((Decimal) this.data[i] / (Decimal) s.data[i]);
+        }
+        return new Series(divValues);
+    }
+
+    public Integer size() {
+        return this.data.size();
+    }
+    
+    public Object row(Integer rowIndex) {
+        if(rowIndex > this.data.size()-1) {
+            throw new PandexExceptions.AccessException('The index provided is out of bounds.');
+        }
+        return this.data[rowIndex];
     }
 
     public Series equals(Series s) {

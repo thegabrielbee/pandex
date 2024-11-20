@@ -4,4 +4,5 @@ public with sharing class PandexExceptions {
     public class TypeNotSupportedException extends Exception {}
     public class SizeMismatchException extends Exception {}
     public class ParameterException extends Exception {}
+    public class AccessException extends Exception {}
 }
